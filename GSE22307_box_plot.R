@@ -1,8 +1,7 @@
-setwd("/Users/shivam/Desktop/experiments/Practice_GSE22307/")
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 BiocManager::install(c("GEOquery", "limma"))
-install.packages(c("dplyr", "tidyverse", "ggplot2", "ggpubr", "stringr", "gridExtra"))
+install.packages(c("dplyr", "tidyverse", "ggplot2", "ggpubr", "stringr"))
 
 library(GEOquery)
 library(limma)
@@ -11,7 +10,6 @@ library(tidyverse)
 library(ggplot2)
 library(ggpubr)
 library(stringr)
-library(gridExtra)
 
 # data retival 
 
