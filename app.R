@@ -5,21 +5,7 @@ if (!requireNamespace("dtw", quietly = TRUE)) install.packages("dtw")
 if (!requireNamespace("matrixStats", quietly = TRUE)) install.packages("matrixStats")
 if (!requireNamespace("data.table", quietly = TRUE)) install.packages("data.table")
 
-setwd("/Users/shivam/Desktop/experiments/Server/")
 
-library(shiny)
-library(shinythemes)
-library(GEOquery)
-library(limma)
-library(dplyr)
-library(tidyverse)
-library(ggplot2)
-library(ggpubr)
-library(stringr)
-library(gridExtra)
-library(dtw)
-library(matrixStats)
-library(data.table)
 
 lapply(c("shiny", "shinythemes", "GEOquery", "limma", "dplyr", "tidyverse", 
          "ggplot2", "ggpubr", "stringr", "gridExtra", "dtw", 
