@@ -1,15 +1,10 @@
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 BiocManager::install(c("GEOquery", "limma"))
-install.packages(c("dplyr", "tidyverse", "ggplot2", "ggpubr", "stringr"))
+install.packages(c("dplyr", "tidyverse", "ggplot2", "ggpubr"))
 
-library(GEOquery)
-library(limma)
-library(dplyr)
-library(tidyverse)
-library(ggplot2)
-library(ggpubr)
-library(stringr)
+lapply(c("GEOquery","limma","dplyr","tidyverse","ggplot2","ggpubr"),
+       library,character.only = TRUE)
 
 # data retival 
 
