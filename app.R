@@ -12,7 +12,8 @@ lapply(c("shiny", "shinythemes", "GEOquery", "limma", "dplyr", "tidyverse",
          "matrixStats", "data.table"), library, character.only = TRUE)
 
 
-
+# Set idle session timeout to 1 minute
+options(shiny.sessionTimeout = 60)  # Timeout after 60 seconds of inactivity
 
 # --- Data Preparation ---
 gse <- getGEO("GSE22307", GSEMatrix = TRUE)
@@ -79,7 +80,9 @@ ui <- fluidPage(
 
 # --- Server ---
 server <- function(input, output, session) {
-  
+  session$onSessionEnded(function() {
+  cat("Session ended due to inactivity.\n")})
+
   selected_data <- reactive({
     if (input$mode == "Single Gene") {
       gene <- input$selected_gene
