@@ -1,9 +1,9 @@
 # Install required packages if not already installed
-if (!requireNamespace("shiny", quietly = TRUE)) install.packages("shiny")
-if (!requireNamespace("shinythemes", quietly = TRUE)) install.packages("shinythemes")
-if (!requireNamespace("dtw", quietly = TRUE)) install.packages("dtw")
-if (!requireNamespace("matrixStats", quietly = TRUE)) install.packages("matrixStats")
-if (!requireNamespace("data.table", quietly = TRUE)) install.packages("data.table")
+#if (!requireNamespace("shiny", quietly = TRUE)) install.packages("shiny")
+#if (!requireNamespace("shinythemes", quietly = TRUE)) install.packages("shinythemes")
+#if (!requireNamespace("dtw", quietly = TRUE)) install.packages("dtw")
+#if (!requireNamespace("matrixStats", quietly = TRUE)) install.packages("matrixStats")
+#if (!requireNamespace("data.table", quietly = TRUE)) install.packages("data.table")
 
 
 
