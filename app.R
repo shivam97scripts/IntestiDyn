@@ -21,14 +21,14 @@ lapply(c("shiny", "shinythemes","dplyr", "tidyverse",
 data_long <- read.csv("GSE22307_data_long.csv")
 
 
-# --- Load Secondary Dataset (GSE131032_data_long.csv) ---
+#Load GSE131032 dataset
 data_long2 <- read.csv("GSE131032_data_long.csv")
 
-# --- Load Inflammation Genes ---
+#Load Inflammation Genes
 GIN_26 <- read.csv("dge_update_25jun24.txt", header = FALSE)
 GIN26_vals <- str_to_title(GIN_26$V1)
 
-# Function to get inflammation data for any dataset
+#Function to get inflammation data for any dataset
 get_inflam_data <- function(data) {
   data[data$gene %in% GIN26_vals, ]
 }
@@ -61,9 +61,9 @@ Inf_dynamics<-function(gene_list,dl){
     annotate("text",x =6, y = 2.1, label = as.character(substitute(g1)), color = "darkgreen", hjust = 1)
 }
 
-plot_spline_comparison("Mmp7",data_long2)
 
-# Plotting function (returns ggplot object)
+
+#Plotting function (returns ggplot object)
 plot_spline_comparison <- function(gene_list, dl) {
   # Expect dl to have columns: gene, samples, day_of_DSS_treatment, Zscore_expression
   if (is.null(gene_list) || length(gene_list) == 0) stop("Provide at least one gene.")
@@ -71,7 +71,7 @@ plot_spline_comparison <- function(gene_list, dl) {
     stop("Dataset must contain columns: gene, samples, day_of_DSS_treatment, Zscore_expression")
   }
   
-  # Prepare test expression (average across samples if multiple genes provided)
+  #Prepare test expression (average across samples if multiple genes provided)
   plot_data <- dl %>%
     filter(gene %in% gene_list) %>%
     group_by(samples, day_of_DSS_treatment) %>%
@@ -79,7 +79,7 @@ plot_spline_comparison <- function(gene_list, dl) {
   
   infl_data <- get_inflam_data(dl)
   
-  # For plot label
+  #For plot label
   label_text <- if (length(gene_list) == 1) gene_list else paste0("Avg(", length(gene_list), " genes)")
   
   ggplot() +
@@ -117,16 +117,16 @@ plot_spline_comparison <- function(gene_list, dl) {
 calculate_expression_stats <- function(gene_list,dl) {
   
 
-  # Get inflam expression 
+  #Get inflam expression 
   inf_genes<- get_inflam_data(dl)
   
-  # Filter for selected gene(s)
+  #Filter for selected gene(s)
   plot_data <- dl %>%
     filter(gene %in% gene_list) %>%
     group_by(samples, day_of_DSS_treatment) %>%
     summarise(Zscore_expression = mean(Zscore_expression, na.rm = TRUE), .groups = "drop")
   
-  # Prepare splines (mean expression per day)
+  #Prepare splines (mean expression per day)
   test_spline <- plot_data %>%
     group_by(day_of_DSS_treatment) %>%
     summarise(expr = mean(Zscore_expression, na.rm = TRUE), .groups = "drop")
@@ -135,25 +135,25 @@ calculate_expression_stats <- function(gene_list,dl) {
     group_by(day_of_DSS_treatment) %>%
     summarise(expr = mean(Zscore_expression, na.rm = TRUE), .groups = "drop")
   
-  # Merge for comparison
+  #Merge for comparison
   merged <- merge(test_spline, infl_spline, by = "day_of_DSS_treatment", suffixes = c("_test", "_inflam"))
   
-  # Compute statistics
+  #Compute statistics
   mae <- mean(abs(merged$expr_test - merged$expr_inflam))
   global_var_test <- var(merged$expr_test)
   global_var_inflam <- var(merged$expr_inflam)
   
-  # Dynamic Time Warping
+  #Dynamic Time Warping
   dtw_dist <- dtw::dtw(merged$expr_test, merged$expr_inflam)$distance
   
-  # Variance per time point
+  #Variance per time point
   var_each_timepoint <- apply(merged[, c("expr_test", "expr_inflam")], 1, var)
   
-  # Spearman correlation
+  #Spearman correlation
   spearman_result <- suppressWarnings(cor.test(merged$expr_test, merged$expr_inflam, method = "spearman"))
   spearman_rho <- round(spearman_result$estimate, 4)
   
-  # Combine into data frame
+  #Combine into data frame
   stats_table <- data.frame(
     Parameter = c(
       "Mean Absolute Error", 
@@ -178,7 +178,7 @@ calculate_expression_stats <- function(gene_list,dl) {
 
 
 
-# --- Shiny UI ---
+#Shiny UI
 ui <- fluidPage(
   theme = shinythemes::shinytheme("cosmo"),
   titlePanel("Gene Expression Spline Viewer (Multiple datasets)"),
@@ -210,7 +210,7 @@ ui <- fluidPage(
   )
 )
 
-# --- Shiny Server ---
+#Shiny Server
 server <- function(input, output, session) {
   # reactive dataset
   ds <- reactive({
@@ -221,7 +221,7 @@ server <- function(input, output, session) {
     }
   })
   
-  # gene selector UI (populated from chosen dataset)
+  #gene selector UI (populated from chosen dataset)
   output$gene_selector_ui <- renderUI({
     df <- ds()
     genes <- unique(df$gene)
@@ -233,7 +233,7 @@ server <- function(input, output, session) {
     updateSelectInput(session, "selected_gene", choices = unique(ds()$gene))
   })
   
-  # reactive: list of genes to analyze
+  #reactive: list of genes to analyze
   selected_genes <- reactive({
     if (input$mode == "Single Gene") {
       req(input$selected_gene)
@@ -246,7 +246,7 @@ server <- function(input, output, session) {
     }
   })
   
-  # reactive: computed plot
+  #reactive: computed plot
   plot_obj <- reactive({
     req(selected_genes())
     dl <- ds()
@@ -262,13 +262,13 @@ server <- function(input, output, session) {
     return(p)
   })
   
-  # render plot
+  #render plot
   output$splinePlot <- renderPlot({
     p <- plot_obj()
     print(p)
   })
   
-  # reactive: stats table
+  #reactive: stats table
   stats_tbl <- reactive({
     req(selected_genes())
     dl <- ds()
@@ -279,7 +279,7 @@ server <- function(input, output, session) {
     stats_tbl()
   })
   
-  # downloads
+  #downloads
   output$downloadStats <- downloadHandler(
     filename = function() {
       suffix <- if (input$mode == "Single Gene") input$selected_gene else "uploaded_genes"
@@ -299,11 +299,11 @@ server <- function(input, output, session) {
       ggsave(filename = file, plot = plot_obj(), device = "png", width = 8, height = 6, dpi = 300)
     }
   )
-  # ---- SESSION TIMEOUT CODE ----
+  #SESSION TIMEOUT CODE
   # Reactive timer and reset trigger
   timeout_timer <- reactiveVal(Sys.time())
   
-  # Watch input for activity (reset timeout)
+  #Watch input for activity (reset timeout)
   observe({
     input$selected_gene
     input$gene_file
@@ -314,7 +314,7 @@ server <- function(input, output, session) {
     timeout_timer(Sys.time())
   })
   
-  # Session killer if 3 minutes passed without activity
+  #Session killer if 1 minutes passed without activity
   observe({
     invalidateLater(10000, session)  # Check every 10 seconds
     if (difftime(Sys.time(), timeout_timer(), units = "secs") > 60) {
@@ -323,6 +323,6 @@ server <- function(input, output, session) {
   })
 }
 
-# --- Run app ---
+#Run app
 shinyApp(ui = ui, server = server)
 
